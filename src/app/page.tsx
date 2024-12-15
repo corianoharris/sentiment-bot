@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import SentimentAnalysisForm from './components/SentimentAnalysisForm'
+import SentimentAnalysisForm from './components/SentimentAnalysisForm/SentimentAnalysisForm'
 
 
 export default function Home() {

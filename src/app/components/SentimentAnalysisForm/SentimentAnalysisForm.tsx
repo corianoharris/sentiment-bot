@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { Message } from '../types';
-import { SentimentAnalyzer } from '../services/sentimentAnalyzer'
-import StorageService from '../services/storageService'
-import { LanguageDetector } from '../services/languageDetector'
+import { Message } from '../../types';
+import { SentimentAnalyzer } from '../../services/sentimentAnalyzer'
+import StorageService from '../../services/storageService'
+import { LanguageDetector } from '../../services/languageDetector'
 
 export default function SentimentAnalysisForm() {
   const [input, setInput] = useState('')

@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# testing
+/coverage
+/cypress/videos
+/cypress/screenshots
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
