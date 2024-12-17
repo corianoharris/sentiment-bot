@@ -157,24 +157,45 @@ const VoiceSentiment = () => {
     };
 
     return (
-        <div className="flex flex-col items-center p-4 space-y-4">
-            <h1 className="text-2xl font-semibold text-black">Voice Sentiment Analysis</h1>
-
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
+                {/* Optional: Added a clear/reset button similar to the new design */}
+                <button 
+                    onClick={() => {
+                        // Add a reset/clear functionality if needed
+                        // For example, clearing transcript or resetting state
+                    }} 
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-md transition"
+                >
+                    Reset
+                </button>
+            </div>
+    
+            <div className="mb-4 space-y-2">
             <button
-                className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
-                onClick={toggleListening}
-            >
-                {isListening ? 'Stop Listening' : 'Start Listening'}
-            </button>
-
-            <div className="text-center border border-gray-300 rounded-md p-4">
-                {error && <p className="text-red-500">{error}</p>}
-                <p className="mt-4 text-black">Transcript: {transcript || 'No text detected yet.'}</p>
-                <p className={`mt-2 ${getSentimentColor(sentiment)}`}>
-                    Sentiment: {sentiment || 'Analysis not available yet.'}
-                </p>
+                        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 mb-4"
+                        onClick={toggleListening}
+                    >
+                        {isListening ? 'Stop Listening' : 'Start Listening'}
+                    </button>
+                <div className="p-4 border rounded-lg bg-gray-50 border-gray-200 shadow-md">
+                   
+    
+                    {error && <p className="text-red-500 mb-2">{error}</p>}
+                    <p className="text-sm text-gray-600 mb-1">
+                        Transcript: {transcript || 'No text detected yet.'}
+                    </p>
+                    <div className="text-xs text-black mt-1">
+                        <span className={`font-semibold ${getSentimentColor(sentiment)}`}>
+                            Sentiment: {sentiment || 'Analysis not available yet.'}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
     );
 };
 
