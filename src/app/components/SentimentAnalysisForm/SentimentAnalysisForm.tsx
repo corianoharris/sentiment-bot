@@ -15,7 +15,7 @@ export default function SentimentAnalysisForm() {
 
   useEffect(() => {
     // Load messages from storage on client-side
-    const loadedMessages = storageService.getMessages()
+    const loadedMessages = storageService ? storageService.getMessages() : [];
     setMessages(loadedMessages)
   }, [storageService])
 
@@ -55,7 +55,6 @@ export default function SentimentAnalysisForm() {
   }
 
   return (
-
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
