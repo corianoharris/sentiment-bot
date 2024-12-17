@@ -58,10 +58,11 @@ export default function SentimentAnalysisForm() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-blue-600">Text Bot</h1>
+            <h1 className="text-2xl font-bold text-blue-600">Text Analysis</h1>
             <button 
               onClick={clearMessages} 
-              className="text-red-500 hover:bg-red-50 p-2 rounded-md transition"
+              className="text-red-500 hover:bg-red-50 p-2 rounded-md transition cursor-not-allowed"
+              disabled={messages.length === 0}
             >
               Clear History
             </button>
@@ -111,7 +112,8 @@ export default function SentimentAnalysisForm() {
             />
             <button 
               type="submit" 
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition cursor-not-allowed"
+              disabled={!input.trim()}
               data-testid="sentiment-submit"
             >
               Analyze

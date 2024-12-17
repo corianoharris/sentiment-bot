@@ -13,9 +13,9 @@ const ToggleCards = () => {
         <div className="flex flex-col items-center space-y-6 p-2">
             {/* Toggle Button */}
             <button
-                className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
+                className={`bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 ${isListening ? 'cursor-not-allowed opacity-50' : ''}`}
                 onClick={() => setActiveCard(activeCard === 'text' ? 'voice' : 'text')}
-                disabled={isListening}
+                disabled={isListening === true && activeCard === 'voice'}
             >
                 {activeCard === 'text' ? 'Switch to Voice' : 'Switch to Text'}
             </button>

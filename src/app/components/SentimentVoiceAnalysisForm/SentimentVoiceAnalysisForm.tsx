@@ -187,7 +187,7 @@ const VoiceSentiment = ({
                 <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
                 <button 
                     onClick={resetButton} 
-                    className="text-red-500 hover:bg-red-50 p-2 rounded-md transition"
+                    className={`text-red-500 hover:bg-red-50 p-2 rounded-md transition ${!transcript || !sentiment || isListening === true ? 'cursor-not-allowed opacity-50' : ''}`}
                     disabled={!transcript || !sentiment || isListening === true} 
                 >
                     Reset
@@ -196,8 +196,9 @@ const VoiceSentiment = ({
     
             <div className="mb-4 space-y-2">
             <button
-                        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 mb-4"
+                        className={`w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 mb-4 ${ error === 'Speech Recognition is not supported in your browser.' ? 'cursor-not-allowed opacity-50' : ''}`}
                         onClick={toggleListening}
+                        disabled={error === 'Speech Recognition is not supported in your browser.'}
                     >
                         {isListening ? 'Stop Listening' : 'Start Listening'}
                     </button>
