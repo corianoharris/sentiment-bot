@@ -6,6 +6,12 @@ import { SentimentAnalyzer } from '../../services/sentimentAnalyzer';
 import StorageService from '../../services/storageService';
 import { LanguageDetector } from '../../services/languageDetector';
 
+interface VoiceSentimentProps {
+
+    isRecording?: boolean;
+    onRecordingChange?: (isRecording: boolean) => void; 
+}
+
 interface Message {
     id: string;
     text: string;
@@ -15,7 +21,9 @@ interface Message {
     timestamp: number;
 }
 
-const VoiceSentiment = () => {
+const VoiceSentiment = ({ 
+   onRecordingChange 
+ }: VoiceSentimentProps) => {
     const [transcript, setTranscript] = useState<string>('');
     const [isListening, setIsListening] = useState<boolean>(false);
     const [sentiment, setSentiment] = useState<string>('');
@@ -88,6 +96,8 @@ const VoiceSentiment = () => {
             const result = event.results[event.results.length - 1][0].transcript;
             setTranscript(result);
             analyzeSentiment(result);
+            setIsListening(true);
+
         };
 
         recognition.onerror = (event: any) => {
@@ -113,7 +123,7 @@ const VoiceSentiment = () => {
 
             setError(userFriendlyError);
             recognition.stop();
-            setIsListening(false);
+            setIsListening(false); 
         };
 
         if (isListening) {
@@ -121,8 +131,10 @@ const VoiceSentiment = () => {
                 recognition.start();
                 setSpeechRecognition(recognition);
                 setError('');
+
             } catch (err) {
                 setError(`Failed to start speech recognition: ${err instanceof Error ? err.message : 'Unknown error'}`);
+                setIsListening(false);
             }
         }
 
@@ -135,13 +147,18 @@ const VoiceSentiment = () => {
 
     const toggleListening = () => {
         if (isListening && speechRecognition) {
+            // Stop speech recognition if it's listening
             speechRecognition.stop();
             setIsListening(false);
-            setSpeechRecognition(null);
+            setSpeechRecognition(null); // Optional, depending on your logic
+            onRecordingChange?.(false); // Indicating recording has stopped
         } else {
+            // Start speech recognition if it's not listening
             setIsListening(true);
+            onRecordingChange?.(true); // Indicating recording has started
         }
     };
+    
 
     const getSentimentColor = (sentiment: string) => {
         switch (sentiment) {
@@ -168,10 +185,10 @@ const VoiceSentiment = () => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
-                {/* Optional: Added a clear/reset button similar to the new design */}
                 <button 
                     onClick={resetButton} 
                     className="text-red-500 hover:bg-red-50 p-2 rounded-md transition"
+                    disabled={!transcript || !sentiment || isListening === true} 
                 >
                     Reset
                 </button>
