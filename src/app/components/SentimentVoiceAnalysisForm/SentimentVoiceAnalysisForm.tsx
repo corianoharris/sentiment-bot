@@ -156,6 +156,13 @@ const VoiceSentiment = () => {
         }
     };
 
+    const resetButton = () => {
+        storageService.clearMessages();
+        setTranscript('');    
+        setSentiment('');
+        setError('');
+    };
+
     return (
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-6">
@@ -163,10 +170,7 @@ const VoiceSentiment = () => {
                 <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
                 {/* Optional: Added a clear/reset button similar to the new design */}
                 <button 
-                    onClick={() => {
-                        // Add a reset/clear functionality if needed
-                        // For example, clearing transcript or resetting state
-                    }} 
+                    onClick={resetButton} 
                     className="text-red-500 hover:bg-red-50 p-2 rounded-md transition"
                 >
                     Reset
