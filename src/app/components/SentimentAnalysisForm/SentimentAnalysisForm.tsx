@@ -6,6 +6,8 @@ import { SentimentAnalyzer } from '../../services/sentimentAnalyzer'
 import StorageService from '../../services/storageService'
 import { LanguageDetector } from '../../services/languageDetector'
 
+import { Messages } from '../shared/Messages'
+
 export default function SentimentAnalysisForm() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -55,8 +57,8 @@ export default function SentimentAnalysisForm() {
   }
 
   return (
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="p-6">
+      <div className="min-w-[400px] max-w-md max-h-[600px] bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="p-6 mt-3 mb-3">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold text-blue-600">Text Analysis</h1>
             <button 
@@ -69,32 +71,7 @@ export default function SentimentAnalysisForm() {
           </div>
 
           {/* Message List */}
-          <div 
-            className="mb-4 h-64 overflow-y-auto space-y-2 border-b pb-2"
-            data-testid="message-list"
-          >
-            {messages.map((msg) => (
-              <div 
-                key={msg.id} 
-                className={`p-3 rounded-lg shadow-md ${
-                  msg.sentiment === 'positive' 
-                    ? 'bg-green-50 border-green-200' 
-                    : msg.sentiment === 'negative' 
-                    ? 'bg-red-50 border-red-200' 
-                    : 'bg-gray-50 border-gray-200'
-                } border`}
-              >
-                <p className="text-sm text-gray-600 mb-1">{msg.text}</p>
-                <div className="text-xs text-black mt-1">
-                  <span>Sentiment: {msg.sentiment}</span>
-                  <span className="ml-2">Score: {msg.score}</span>
-                  {msg.language && (
-                    <span className="ml-2">Language: {msg.language}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+         <Messages messages={messages} />
 
           {/* Input Form */}
           <form 
