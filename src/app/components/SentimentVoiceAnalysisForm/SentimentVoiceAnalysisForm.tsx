@@ -62,9 +62,6 @@ const VoiceSentiment = ({
                 storageService.saveMessages(updatedMessages);
 
 
-                ;
-
-
                 // Set sentiment based on score
                 if (result.score > 0)
                 {
