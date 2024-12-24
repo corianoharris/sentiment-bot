@@ -10,7 +10,7 @@ export default function SentimentAnalysisForm() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const sentimentAnalyzer = new SentimentAnalyzer()
-  const storageService = useMemo(() => new StorageService(), []);
+  const storageService = useMemo(() => new StorageService('sentimentTextBotMessages'), []);
   const languageDetector = new LanguageDetector()
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function SentimentAnalysisForm() {
             <h1 className="text-2xl font-bold text-blue-600">Text Analysis</h1>
             <button 
               onClick={clearMessages} 
-              className="text-red-500 hover:bg-red-50 p-2 rounded-md transition cursor-not-allowed"
+              className={`text-red-500 hover:bg-red-50 p-2 rounded-md transition ${messages.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
               disabled={messages.length === 0}
             >
               Clear History
@@ -112,7 +112,7 @@ export default function SentimentAnalysisForm() {
             />
             <button 
               type="submit" 
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition cursor-not-allowed"
+              className={ `bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition ${!input.trim() ? 'cursor-not-allowed opacity-50' : ''}}`}
               disabled={!input.trim()}
               data-testid="sentiment-submit"
             >
