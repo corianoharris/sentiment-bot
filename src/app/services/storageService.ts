@@ -2,7 +2,14 @@ import { Message } from '../types'
 
 export default class StorageService
 {
-    private STORAGE_KEY = 'sentimentBotMessages'
+    private STORAGE_KEY: string
+
+    constructor(privateKey: string =  'sentimentBotMessages') 
+    
+    {
+        
+        this.STORAGE_KEY = privateKey
+    }    
 
     saveMessages(messages: Message[]): void
     {
