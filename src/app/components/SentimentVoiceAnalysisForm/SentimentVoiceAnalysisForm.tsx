@@ -6,84 +6,102 @@ import { SentimentAnalyzer } from '../../services/sentimentAnalyzer';
 import StorageService from '../../services/storageService';
 import { LanguageDetector } from '../../services/languageDetector';
 
-interface VoiceSentimentProps {
+import { Message } from '@/app/types';
+
+interface VoiceSentimentProps
+{
 
     isRecording?: boolean;
-    onRecordingChange?: (isRecording: boolean) => void; 
+    onRecordingChange?: (isRecording: boolean) => void;
 }
 
-interface Message {
-    id: string;
-    text: string;
-    sentiment: 'positive' | 'negative' | 'neutral';
-    score: number;
-    language?: string;
-    timestamp: number;
-}
 
-const VoiceSentiment = ({ 
-   onRecordingChange 
- }: VoiceSentimentProps) => {
+const VoiceSentiment = ({
+    onRecordingChange
+}: VoiceSentimentProps) =>
+{
     const [transcript, setTranscript] = useState<string>('');
     const [isListening, setIsListening] = useState<boolean>(false);
     const [sentiment, setSentiment] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [speechRecognition, setSpeechRecognition] = useState<any>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+
+
 
     // Memoize services
     const sentimentAnalyzer = useMemo(() => new SentimentAnalyzer(), []);
-    const storageService = useMemo(() => new StorageService(), []);
+    const storageService = useMemo(() => new StorageService('sentimentVoiceBotMessages'), []);
     const languageDetector = useMemo(() => new LanguageDetector(), []);
 
     // Memoize sentiment analysis function
     const analyzeSentiment = useCallback(
-        (text: string) => {
-            try {
-                // Detect language
-                const detectedLanguage = languageDetector.detect(text);
+        async (text: string) =>
+        {
+            try
+            {
+            
+
+                  const detectedLanguage = await languageDetector.detect(text);
 
                 // Analyze sentiment
                 const result = sentimentAnalyzer.analyze(text);
 
                 // Store messages
-                const storedMessages = storageService.getMessages();
-                const updatedMessages = [
-                    ...storedMessages,
-                    {
-                        text,
-                        id: `msg-${Date.now()}`,
-                        score: result.score,
-                        sentiment: result.score,
-                        language: detectedLanguage,
-                        timestamp: Date.now().toLocaleString(),
-                    },
-                ];
-                storageService.saveMessages(updatedMessages as Message[]);
+                const newMessage: Message = {
+                    id: `msg-${Date.now()}`,
+                    text: text,
+                    sentiment: result.sentiment,
+                    score: result.score,
+                    language: detectedLanguage ?? 'en',
+                    timestamp: Date.now()
+                }
+
+                const updatedMessages = [...messages, newMessage];
+                setMessages(updatedMessages);
+                storageService.saveMessages(updatedMessages);
+
+
+                ;
+
 
                 // Set sentiment based on score
-                if (result.score > 0) {
+                if (result.score > 0)
+                {
                     setSentiment('Positive');
-                } else if (result.score < 0) {
+                } else if (result.score < 0)
+                {
                     setSentiment('Negative');
-                } else {
+                } else
+                {
                     setSentiment('Neutral');
                 }
-            } catch (err) {
+            } catch (err)
+            {
                 setError(
                     `Sentiment analysis error: ${err instanceof Error ? err.message : 'Unknown error'}`
                 );
             }
         },
-        [sentimentAnalyzer, languageDetector, storageService]
+        [sentimentAnalyzer, languageDetector, storageService, messages]
     );
 
+    useEffect(() =>
+    {
+        // Load messages from storage on client-side
+        const loadedMessages = storageService ? storageService.getMessages() : [];
+        setMessages(loadedMessages)
+    }, [storageService])
+
     // Speech recognition setup
-    useEffect(() => {
+    useEffect(() =>
+    {
         const SpeechRecognition =
             typeof window !== 'undefined' &&
             (window.SpeechRecognition || window.webkitSpeechRecognition);
 
-        if (!SpeechRecognition) {
+        if (!SpeechRecognition)
+        {
             setError('Speech Recognition is not supported in your browser.');
             return;
         }
@@ -92,19 +110,28 @@ const VoiceSentiment = ({
         recognition.continuous = true;
         recognition.interimResults = true;
 
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: any) =>
+        {
             const result = event.results[event.results.length - 1][0].transcript;
             setTranscript(result);
+            setMessages([...messages, {
+                text: result, id: Date.now().toString(),
+                sentiment: 'neutral',
+                score: 0,
+                timestamp: 0
+            }]);
             analyzeSentiment(result);
             setIsListening(true);
 
         };
 
-        recognition.onerror = (event: any) => {
+        recognition.onerror = (event: any) =>
+        {
             const errorType = event.error;
             let userFriendlyError = 'An error occurred with speech recognition.';
 
-            switch (errorType) {
+            switch (errorType)
+            {
                 case 'network':
                     userFriendlyError = 'Network error. Please check your connection.';
                     break;
@@ -123,45 +150,56 @@ const VoiceSentiment = ({
 
             setError(userFriendlyError);
             recognition.stop();
-            setIsListening(false); 
+            setIsListening(false);
         };
 
-        if (isListening) {
-            try {
+        if (isListening)
+        {
+            try
+            {
                 recognition.start();
                 setSpeechRecognition(recognition);
                 setError('');
 
-            } catch (err) {
+            } catch (err)
+            {
                 setError(`Failed to start speech recognition: ${err instanceof Error ? err.message : 'Unknown error'}`);
                 setIsListening(false);
             }
         }
 
-        return () => {
-            if (speechRecognition) {
+        return () =>
+        {
+            if (speechRecognition)
+            {
                 speechRecognition.stop();
             }
         };
-    }, [isListening, analyzeSentiment]);
+    }, [ isListening]);
 
-    const toggleListening = () => {
-        if (isListening && speechRecognition) {
+    const toggleListening = () =>
+    {
+        if (isListening && speechRecognition)
+        {
             // Stop speech recognition if it's listening
             speechRecognition.stop();
             setIsListening(false);
             setSpeechRecognition(null); // Optional, depending on your logic
             onRecordingChange?.(false); // Indicating recording has stopped
-        } else {
+        } else
+        {
             // Start speech recognition if it's not listening
             setIsListening(true);
-            onRecordingChange?.(true); // Indicating recording has started
+            onRecordingChange?.(true);
+            setTranscript(''); // Indicating recording has started
         }
     };
-    
 
-    const getSentimentColor = (sentiment: string) => {
-        switch (sentiment) {
+
+    const getSentimentColor = (sentiment: string) =>
+    {
+        switch (sentiment)
+        {
             case 'Positive':
                 return 'text-green-500';
             case 'Neutral':
@@ -173,51 +211,82 @@ const VoiceSentiment = ({
         }
     };
 
-    const resetButton = () => {
+    const clearMessages = () =>
+    {
+        setMessages([]);
         storageService.clearMessages();
-        setTranscript('');    
+        setTranscript('');
         setSentiment('');
         setError('');
     };
 
     return (
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
-                <button 
-                    onClick={resetButton} 
-                    className={`text-red-500 hover:bg-red-50 p-2 rounded-md transition ${!transcript || !sentiment || isListening === true ? 'cursor-not-allowed opacity-50' : ''}`}
-                    disabled={!transcript || !sentiment || isListening === true} 
-                >
-                    Reset
-                </button>
-            </div>
-    
-            <div className="mb-4 space-y-2">
-            <button
-                        className={`w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 mb-4 ${ error === 'Speech Recognition is not supported in your browser.' ? 'cursor-not-allowed opacity-50' : ''}`}
-                        onClick={toggleListening}
-                        disabled={error === 'Speech Recognition is not supported in your browser.'}
-                    >
-                        {isListening ? 'Stop Listening' : 'Start Listening'}
-                    </button>
-                <div className="p-4 border rounded-lg bg-gray-50 border-gray-200 shadow-md">
-                   
-    
-                    {error && <p className="text-red-500 mb-2">{error}</p>}
-                    <p className="text-sm text-gray-600 mb-1">
-                        Transcript: {transcript || 'No text detected yet.'}
-                    </p>
-                    <div className="text-xs text-black mt-1">
-                        <span className={`font-semibold ${getSentimentColor(sentiment)}`}>
-                            Sentiment: {sentiment || 'Analysis not available yet.'}
-                        </span>
+        <>
+            <div className="w-full min-w-4 max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h1 className="text-2xl font-bold text-blue-600">Voice Analysis</h1>
+                        <button
+                            onClick={clearMessages}
+                            className={`text-red-500 hover:bg-red-50 p-2 rounded-md transition ${messages.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                            disabled={messages.length === 0}
+                        >
+                            Clear History
+                        </button>
+                    </div>
+
+                    <div className="mb-4 space-y-2">
+                        <button
+                            className={`w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 mb-4 ${error === 'Speech Recognition is not supported in your browser.' ? 'cursor-not-allowed opacity-50' : ''}`}
+                            onClick={toggleListening}
+                            disabled={error === 'Speech Recognition is not supported in your browser.'}
+                        >
+                            {isListening ? 'Stop Listening' : 'Start Listening'}
+                        </button>
+                        <div className="p-4 border rounded-lg bg-gray-50 border-gray-200 shadow-md">
+
+                            {/* Message List */}
+                            <div
+                                className="mb-4 h-64 overflow-y-auto space-y-2 border-b pb-2"
+                                data-testid="message-list"
+                            >
+                                {messages.map((msg) => (
+                                    <div
+                                        key={msg.id}
+                                        className={`p-3 rounded-lg shadow-md ${msg.sentiment === 'positive'
+                                                ? 'bg-green-50 border-green-200'
+                                                : msg.sentiment === 'negative'
+                                                    ? 'bg-red-50 border-red-200'
+                                                    : 'bg-gray-50 border-gray-200'
+                                            } border`}
+                                    >
+                                        <p className="text-sm text-gray-600 mb-1">{msg.text}</p>
+                                        <div className="text-xs text-black mt-1">
+                                            <span>Sentiment: {msg.sentiment}</span>
+                                            <span className="ml-2">Score: {msg.score}</span>
+                                            {msg.language && (
+                                                <span className="ml-2">Language: {msg.language}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+
+                            {error && <p className="text-red-500 mb-2">{error}</p>}
+                            <p className="text-sm text-gray-600 mb-1">
+                                Transcript: {transcript || 'No text detected yet.'}
+                            </p>
+                            <div className="text-xs text-black mt-1">
+                                <span className={`font-semibold ${getSentimentColor(sentiment)}`}>
+                                    Sentiment: {sentiment || 'Analysis not available yet.'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </>
     );
 };
 
