@@ -10,7 +10,7 @@ const ToggleCards = () => {
 
 
     return (
-        <div className="flex flex-col items-center space-y-6 p-2">
+        <div className="flex flex-col items-center space-y-6 p-2 mt-4 mb-4">
             {/* Toggle Button */}
             <button
                 className={`bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 ${isListening ? 'cursor-not-allowed opacity-50' : ''}`}
