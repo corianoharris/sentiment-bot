@@ -19,3 +19,20 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.fade-in {
+  animation: fadeIn ease 3s forwards; /* Adjusted to 800ms for a smooth fade */
+  -webkit-animation: fadeIn ease 3s   forwards; /* For Safari */
+  -moz-animation: fadeIn ease 3s  forwards; /* For Firefox */
+  -o-animation: fadeIn ease 3s forwards; /* For Opera */
+  -ms-animation: fadeIn ease 3s forwards; /* For Internet Explorer */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
