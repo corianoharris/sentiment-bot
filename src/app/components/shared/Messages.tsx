@@ -11,7 +11,7 @@ interface MessagesProps
 export function Messages({ messages }: MessagesProps)
 {
     const sortedMessages = messages.sort((a, b) => b.timestamp - a.timestamp);
-    
+
     return (
         <div
             className="mb-4 h-64 overflow-y-auto space-y-2 border-b pb-2"
@@ -27,14 +27,37 @@ export function Messages({ messages }: MessagesProps)
                             : 'bg-gray-50 border-gray-200'
                         } border`}
                 >
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">{msg.text}</p>
-                    <div className="text-xs text-black mt-1">
+                    {msg.score >= 2 && (
+                        <div className='p-3 rounded-lg shadow-md mt-2 mb-6 font-light  '>
+                            <p className='text-sm text-gray-600 mb-1 text-right '> 🤖 🤝...</p>
+                            <p className=" text-sm font-light text-black mb-1">{"Love the positivity!"}</p>
+                        </div>
+                    )}
+
+                    {msg.score >= 0 && msg.score < 2 && (
+                        <div className='p-3 rounded-lg shadow-md mt-2 mb-6 font-light '>
+                            <p className='text-sm text-gray-600 mb-1 text-right'> 🤖...</p>
+                            <p className=" text-sm font-light text-black mb-1">{"If you’d like, you could add a bit more detail or emotion to make it more engaging and relatable"}</p>
+                        </div>
+                    )}
+
+                    {msg.score < 0 && (
+
+                        <div className='p-3 rounded-lg shadow-md mt-2 mb-6 font-light '>
+                            <p className='text-sm text-gray-600 mb-1  text-right'>🤖...</p>
+                            <p className="text-sm text-black">{" I hear you—that sounds frustrating. Maybe shifting the focus to what could help or improve the situation might make it feel a little lighter."}</p>
+                        </div>
+
+                    )}
+
+                    <p className="text-md text-gray-600 mb-1 font-semibold">{` 👤... ${msg.text}`}</p>
+                    <div className="text-xs text-black mt-1 italic">
                         <span>Sentiment: {msg.sentiment}</span>
-                        <span className="ml-2">Score: {msg.score}</span>
+                        <span className="ml-1">Score: {msg.score}</span>
                         {msg.language && (
-                            <span className="ml-2">Language: {msg.language}</span>
+                            <span className="ml-1">Language: {msg.language}</span>
                         )}
-                        <p className="mt-1">Timestamp: {new Date(msg.timestamp).toLocaleString()}</p>
+                        <p >Timestamp: {new Date(msg.timestamp).toLocaleString()}</p>
                     </div>
                 </div>
             ))}

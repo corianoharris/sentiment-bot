@@ -16,6 +16,7 @@ export class SentimentAnalyzer
 
         const sentimentThresholds = {
             positive: 2,
+            neutral: 0,
             negative: -2
         }
 
